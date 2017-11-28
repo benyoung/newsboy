@@ -73,23 +73,35 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
     polyhedron(points=P, faces=T);
 }
 
-steps=10;
+//steps=10;
+//
+//control_points_left = [[0,0,0],[10,0,0],[10,0,10],[10,10,10]];
+//split_time = 0.7;
+//cp1 = left_split(control_points_left, split_time);
+//color("red")
+//bezier_tube(cp1, steps);
+//cp2 = right_split(control_points_left, split_time);
+//color("green")
+//bezier_tube(cp2, steps);
+//control_points_right = [[0,0,0],[0,10,0],[0,10,10],[10,10,10]];
+//bezier_tube(control_points_right, steps);
+//two_bezier_patch(control_points_left, control_points_right, steps);
 
-control_points_left = [[0,0,0],[10,0,0],[10,0,10],[10,10,10]];
 
-split_time = 0.7;
-cp1 = left_split(control_points_left, split_time);
-color("red")
-bezier_tube(cp1, steps);
+mm=1;
+cm = 10*mm;
+in=25.4*mm;
 
-cp2 = right_split(control_points_left, split_time);
-color("green")
-bezier_tube(cp2, steps);
-echo(cp2);
-control_points_right = [[0,0,0],[0,10,0],[0,10,10],[10,10,10]];
-bezier_tube(control_points_right, steps);
+translate([0,0,-7.5*in])
+scale(25.4)
+rotate([0,0,180])
+import("HeadStand.STL");  
+// I think this model was based on inches as the dimensionless unit
+// at least it is consistent with an average male interpupillary distance of 64mm
 
-two_bezier_patch(control_points_left, control_points_right, steps);
+
+
+
 
 
 
