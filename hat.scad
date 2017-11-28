@@ -65,7 +65,7 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
     points_right = [for(inc = [0:steps]) bezier3(controlpoints_right, inc/steps)];
     P = cat(points_left, points_right);
     
-    triangles_1 = [for(i=[0:steps-1]) [steps+i, i, steps+i+1]];
+    triangles_1 = [for(i=[1:steps-1]) [steps+i, i, steps+i+1]];
     triangles_2 = [for(i=[0:steps-1]) [i+1,  i, steps+i+1]];
     T = cat(triangles_1, triangles_2);
     
@@ -147,8 +147,8 @@ color("blue")
 bezier_tube(q4_brim, 20, 5*mm);
 
 brim_split_point = 0.58;
-brim_tip_offset = [1.5*in,0*in,-1*in];
-brim_control_width = 2*in;
+brim_tip_offset = [1.3*in,0*in,-1*in];
+brim_control_width = 2.2*in;
 brim_left_temple_pull = [1*in,0*in,-0.5*in];
 brim_right_temple_pull = brim_left_temple_pull - [0,2*brim_left_temple_pull[1],0];
 
