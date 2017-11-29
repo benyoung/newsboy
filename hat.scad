@@ -219,7 +219,7 @@ line_segment(peak_anchor, peak_control, control_thickness);
 *color("blue")
 bezier_tube(peak_spline, 20, control_thickness);
 
-peak_crest_control_offset = [-1.1*in, 0, 1.6*in];
+peak_crest_control_offset = [-1.1*in, 0, 1.5*in];
 peak_crest_control = peak_anchor + peak_crest_control_offset;
 front_crest_spline = [peak_anchor, peak_crest_control, top_control_front, top_anchor];
 front_split_t = 0.5;
