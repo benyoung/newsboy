@@ -171,13 +171,13 @@ bezier_tube(brim_edge_spline, 20, control_thickness);
 
 
 
-top_anchor = [-0.5*in,0,4.3*in];
-top_control_front_len = 3.5*in;
+top_anchor = [-0.5*in,0,4.0*in];
+top_control_front_len = 3*in;
 top_control_front = top_anchor + top_control_front_len*[1,0,0];
 top_control_rear_len = 2.5*in;
 top_control_rear = top_anchor + top_control_rear_len*[-1,0,0];
 
-upper_side_anchor = top_anchor + [0*in, 2.8*in, -1.3*in];
+upper_side_anchor = top_anchor + [0*in, 2.9*in, -0.3*in];
 upper_side_rear_control_len = 2*in; // the front control len is to be the same as the top one
 upper_side_angle = 8;
 upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
@@ -219,7 +219,7 @@ line_segment(peak_anchor, peak_control, control_thickness);
 *color("blue")
 bezier_tube(peak_spline, 20, control_thickness);
 
-peak_crest_control_offset = [-0.9*in, 0, 1.5*in];
+peak_crest_control_offset = [-1.1*in, 0, 1.6*in];
 peak_crest_control = peak_anchor + peak_crest_control_offset;
 front_crest_spline = [peak_anchor, peak_crest_control, top_control_front, top_anchor];
 front_split_t = 0.5;
