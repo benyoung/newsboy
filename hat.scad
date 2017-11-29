@@ -65,7 +65,7 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
     points_right = [for(inc = [0:steps]) bezier3(controlpoints_right, inc/steps)];
     P = cat(points_left, points_right);
     
-    triangles_1 = [for(i=[1:steps-1]) [steps+i, i, steps+i+1]];
+    triangles_1 = [for(i=[1:steps]) [steps+i, i, steps+i+1]];
     triangles_2 = [for(i=[0:steps-1]) [i+1,  i, steps+i+1]];
     T = cat(triangles_1, triangles_2);
     
@@ -75,9 +75,12 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
 
 
 
+
 mm=1;
 cm = 10*mm;
 in=25.4*mm;
+
+control_thickness = 2*mm;
 
 rotate([0,8,0])
 translate([0,0,-7.5*in])
@@ -88,109 +91,188 @@ import("HeadStand.STL");
 // at least it is consistent with an average male interpupillary distance of 64mm
 
 //splines for hatband. these are distances from origin to various points on the head
-head_rear_len = 4.15*in;
-head_front_len = 4.0*in;
-head_side_len = 3.05*in;
+head_rear_len = 4.3*in;
+head_front_len = 4.1*in;
+head_side_len = 3.3*in;
+rear_anchor = [-head_rear_len, 0,0];
+
+echo (rear_anchor);
+
 
 head_rear_control_len = 1.7*in;
 head_front_control_len = 2.1*in;
-head_side_control_back_len = 2.8*in;
+head_side_control_rear_len = 2.8*in;
 head_side_control_front_len = 2.5*in;
 head_side_control_angle = 3;
 
-head_left_unit_vector = [cos(head_side_control_angle), -sin(head_side_control_angle), 0];
-head_right_unit_vector = [cos(head_side_control_angle), sin(head_side_control_angle), 0];
-rear_anchor =[-head_rear_len,0,0];
+
+side_unit_vector = [cos(head_side_control_angle), -sin(head_side_control_angle), 0];
+
+
 front_anchor=[head_front_len,0,0];
-left_anchor=[0,head_side_len,0];
-right_anchor=[0,-head_side_len,0];
-*for(p = [rear_anchor, front_anchor,left_anchor,right_anchor]) {
+side_anchor=[0,head_side_len,0];
+*for(p = [rear_anchor, front_anchor,side_anchor]) {
     translate(p)
     color("red")
-    sphere(5*mm, $fn=16);
+    sphere(control_thickness, $fn=16);
 }
 
-rear_control_left = rear_anchor + [0,head_rear_control_len,0];
-rear_control_right = rear_anchor + [0,-head_rear_control_len,0];
+rear_control = rear_anchor + [0,head_rear_control_len,0];
+
 *color("red")
-line_segment(rear_control_left, rear_control_right, 5*mm);
+line_segment(rear_control, rear_anchor, control_thickness);
 
-front_control_left = front_anchor + [0,head_front_control_len,0];
-front_control_right = front_anchor + [0,-head_front_control_len,0];
+front_control = front_anchor + [0,head_front_control_len,0];
 *color("red")
-line_segment(front_control_left, front_control_right, 5*mm);
+line_segment(front_control, front_anchor, control_thickness);
 
-left_control_back = left_anchor - head_left_unit_vector*head_side_control_back_len;
-left_control_front = left_anchor + head_left_unit_vector*head_side_control_front_len;
+side_control_rear = side_anchor - side_unit_vector*head_side_control_rear_len;
+side_control_front = side_anchor + side_unit_vector*head_side_control_front_len;
 *color("red")
-line_segment(left_control_back, left_control_front, 5*mm);
+line_segment(side_control_rear, side_control_front, control_thickness);
 
-right_control_back = right_anchor - head_right_unit_vector*head_side_control_back_len;
-right_control_front = right_anchor + head_right_unit_vector*head_side_control_front_len;
-*color("red")
-line_segment(right_control_back, right_control_front, 5*mm);
+q1_brim = [front_anchor, front_control, side_control_front, side_anchor];
+*color("blue")
+bezier_tube(q1_brim, 20, control_thickness);
 
-q1_brim = [front_anchor, front_control_left, left_control_front, left_anchor];
-color("blue")
-bezier_tube(q1_brim, 20, 5*mm);
+q2_brim = [side_anchor, side_control_rear, rear_control, rear_anchor];
+*color("blue")
+bezier_tube(q2_brim, 20, control_thickness);
 
-q2_brim = [left_anchor, left_control_back, rear_control_left, rear_anchor];
-color("blue")
-bezier_tube(q2_brim, 20, 5*mm);
-
-q3_brim = [right_anchor, right_control_back, rear_control_right, rear_anchor];
-color("blue")
-bezier_tube(q3_brim, 20, 5*mm);
-
-q4_brim = [front_anchor, front_control_right, right_control_front, right_anchor];
-color("blue")
-bezier_tube(q4_brim, 20, 5*mm);
-
-brim_split_point = 0.58;
+brim_split_point = 0.8;
 brim_tip_offset = [1.3*in,0*in,-1*in];
 brim_control_width = 2.2*in;
-brim_left_temple_pull = [1*in,0*in,-0.5*in];
-brim_right_temple_pull = brim_left_temple_pull - [0,2*brim_left_temple_pull[1],0];
+brim_temple_pull = [1*in,0*in,-0.5*in];
 
-left_brim_forehead_spline = left_split(q1_brim, brim_split_point);
+brim_forehead_spline = left_split(q1_brim, brim_split_point);
+brim_side_spline = right_split(q1_brim, brim_split_point);
 *color("blue")
-bezier_tube(left_brim_forehead_spline, 20, 5*mm);
+bezier_tube(brim_forehead_spline, 20, control_thickness);
 
-right_brim_forehead_spline = left_split(q4_brim, brim_split_point);
-*color("blue")
-bezier_tube(right_brim_forehead_spline, 20, 5*mm);
+brim_anchor = brim_forehead_spline[0] + brim_tip_offset;
+brim_temple_anchor = brim_forehead_spline[3];
+brim_temple_control = brim_temple_anchor + brim_temple_pull;
 
-brim_anchor = left_brim_forehead_spline[0] + brim_tip_offset;
-brim_left_temple_anchor = left_brim_forehead_spline[3];
-brim_left_temple_control = brim_left_temple_anchor + brim_left_temple_pull;
-
-brim_right_temple_anchor = right_brim_forehead_spline[3];
-brim_right_temple_control = brim_right_temple_anchor + brim_right_temple_pull;
-
-brim_left_control = brim_anchor + [0,brim_control_width,0];
-brim_right_control = brim_anchor - [0,brim_control_width,0];
+brim_control = brim_anchor + [0,brim_control_width,0];
 *color("red") {
-    for(anchor = [brim_anchor, brim_left_temple_anchor, brim_right_temple_anchor])
+    for(anchor = [brim_anchor, brim_temple_anchor])
     translate(anchor)
-    sphere(5*mm, $fn=16);
+    sphere(control_thickness, $fn=16);
     
-    line_segment(brim_left_temple_anchor, brim_left_temple_control, 5*mm);
-    line_segment(brim_right_temple_anchor, brim_right_temple_control, 5*mm);
-    line_segment(brim_left_control, brim_right_control, 5*mm);
+    line_segment(brim_temple_anchor, brim_temple_control, control_thickness);
+    line_segment(brim_control, brim_anchor, control_thickness);
 }
 
-left_brim_edge_spline = [brim_anchor, brim_left_control, brim_left_temple_control, brim_left_temple_anchor];
-color("blue")
-bezier_tube(left_brim_edge_spline, 20, 5*mm);
-
-right_brim_edge_spline = [brim_anchor, brim_right_control, brim_right_temple_control, brim_right_temple_anchor];
-color("blue")
-bezier_tube(right_brim_edge_spline, 20, 5*mm);
+brim_edge_spline = [brim_anchor, brim_control, brim_temple_control, brim_temple_anchor];
+*color("blue")
+bezier_tube(brim_edge_spline, 20, control_thickness);
     
-color("blue")
-two_bezier_patch(left_brim_edge_spline, left_brim_forehead_spline,20);
-color("blue")
-two_bezier_patch(right_brim_edge_spline, right_brim_forehead_spline,20);
+
+
+
+
+top_anchor = [-0.5*in,0,4.3*in];
+top_control_front_len = 3.5*in;
+top_control_front = top_anchor + top_control_front_len*[1,0,0];
+top_control_rear_len = 2.5*in;
+top_control_rear = top_anchor + top_control_rear_len*[-1,0,0];
+
+upper_side_anchor = top_anchor + [0*in, 2.8*in, -1.3*in];
+upper_side_rear_control_len = 2*in; // the front control len is to be the same as the top one
+upper_side_angle = 8;
+upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
+upper_side_control_front = upper_side_anchor + top_control_front_len*upper_side_unit_vector;
+upper_side_control_rear = upper_side_anchor - upper_side_rear_control_len*upper_side_unit_vector;
+
+*color("red") {
+    translate(top_anchor)
+    sphere(control_thickness);
+    line_segment(top_control_rear, top_control_front, control_thickness);
+}
+
+
+
+*color("red") {
+    translate(upper_side_anchor)
+    sphere(control_thickness);
+    line_segment(upper_side_control_rear, upper_side_control_front, control_thickness);
+}
+
+peak_lift = [0.1*in, 0, 0.6*in];
+
+peak_anchor = brim_edge_spline[0] + peak_lift;
+peak_control_stretch = 1.6;
+peak_control = peak_control_stretch * [0,brim_control_width,0] + peak_anchor;
+peak_spline = [peak_anchor, peak_control, upper_side_control_front, upper_side_anchor];
+
+peak_split_t = 0.6;
+front_peak_spline = left_split(peak_spline, peak_split_t);
+mid_peak_spline = right_split(peak_spline, peak_split_t);
+*color("red")
+translate(mid_peak_spline[0])
+sphere(control_thickness);
+
+
+*color("red")
+line_segment(peak_anchor, peak_control, control_thickness);
+
+*color("blue")
+bezier_tube(peak_spline, 20, control_thickness);
+
+peak_crest_control_offset = [-0.9*in, 0, 1.5*in];
+peak_crest_control = peak_anchor + peak_crest_control_offset;
+front_crest_spline = [peak_anchor, peak_crest_control, top_control_front, top_anchor];
+front_split_t = 0.5;
+veryfront_crest_spline = left_split(front_crest_spline, front_split_t);
+mid_crest_spline = right_split(front_crest_spline, front_split_t);
+
+color("red")
+line_segment(peak_anchor, peak_crest_control, control_thickness);
+
+*color("blue")
+bezier_tube(front_crest_spline, 20, control_thickness);
+
+rear_crest_control_len = 3*in;
+rear_crest_control = rear_anchor + [0,0,rear_crest_control_len];
+rear_crest_spline = [top_anchor, top_control_rear, rear_crest_control, rear_anchor];
+*color("blue")
+bezier_tube(rear_crest_spline, 20, control_thickness);
+
+rear_split_t = 0.7;
+rear_edge_spline = right_split(q2_brim, rear_split_t);
+rear_mid_spline = left_split(q2_brim, rear_split_t);
+
+rear_split_point = rear_edge_spline[0];
+*color("red")
+translate(rear_split_point)
+sphere(r=control_thickness);
+
+rear_split_control_len = 2*in;
+rear_split_control = rear_split_point + [0,0,rear_split_control_len];
+rear_upperpanel_spline = [upper_side_anchor, upper_side_control_rear, rear_split_control, rear_split_point];
+
+*color("blue")
+bezier_tube(rear_upperpanel_spline, 20, control_thickness);
+
+module half_hat() {
+    color("blue") {
+        two_bezier_patch(brim_edge_spline, front_peak_spline, 20);
+        two_bezier_patch(brim_side_spline, mid_peak_spline, 20);
+        two_bezier_patch(rear_mid_spline, rear_upperpanel_spline, 20);
+        
+        two_bezier_patch(front_peak_spline, veryfront_crest_spline, 20);
+        two_bezier_patch(mid_peak_spline, mid_crest_spline, 20);
+        two_bezier_patch(rear_upperpanel_spline, rear_crest_spline, 20);
+        
+        two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
+    }
+}
+
+half_hat();
+mirror([0,1,0])
+half_hat();
+
+
 
 
 
