@@ -74,6 +74,33 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
     polyhedron(points=P, faces=T);
 }
 
+// angles A,B,C in triangle ABC
+function angle_A(T) = acos((T[1]-T[0]) *(T[2]-T[0])/norm(T[1]-T[0])/norm(T[2]-T[0]));
+function angle_B(T) = acos((T[0]-T[1]) *(T[2]-T[1])/norm(T[0]-T[1])/norm(T[2]-T[1]));
+function angle_C(T) = acos((T[0]-T[2]) *(T[1]-T[2])/norm(T[0]-T[2])/norm(T[1]-T[2]));
+
+// the standard angle, in plane, from point a to point b
+function standard_angle(a,b) = atan2(b[1]-a[1], b[0]-a[0]);
+
+// lengths of sides AB,BC,AC of triangle ABC
+function len_BC(T) = norm(T[2]-T[1]);
+function len_AC(T) = norm(T[2]-T[0]);
+function len_AB(T) = norm(T[1]-T[0]);
+
+// go to point p, face in direction theta and walk distance d
+function go(p, theta, d)= p + [cos(theta), sin(theta)]*d;
+
+// construct a triangle abc congruent to T=ABC in the plane, given pre-constructed points a, b
+function construct_triangle_pos(T,a_p, b_p) = go(b_p, angle_B(T)-standard_angle(b_p,a_p), len_BC(T));
+function construct_triangle_neg(T,a_p, b_p) = go(b_p,-angle_B(T)-standard_angle(b_p,a_p), len_BC(T));
+
+// construct a triangle by zigzagging from bezier Cl to Cr at times t1, t2
+function zig(Cl,Cr,t1,t2) = [bezier3(Cl,t1), bezier3(Cr,t1), bezier3(Cl,t2)];
+function zag(Cl,Cr,t1,t2) = [bezier3(Cr,t1), bezier3(Cl,t2), bezier3(Cr,t2)];
+
+// flatten out one zigzag step
+function flat_zig(Cl, Cr, t, inc, a, b) = construct_triangle_pos(zig(Cl,Cr,t1,t2),a,b);
+function flat_zag(Cl, Cr, t, inc, a, b) = construct_triangle_neg(zag(Cl,Cr,t1,t2),a,b);
 
 
 
