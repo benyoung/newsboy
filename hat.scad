@@ -58,19 +58,17 @@ module bezier_tube(control_points, steps, thickness) {
     
 }
 
-// function to concatenate lists - from openscad wiki
-function cat(L1, L2) = [for(L=[L1, L2], a=L) a];
 
 
 // 3d model of a "zigzag" triangulated surface spanning the space betweenh two bezier curves.
 module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
     points_left  = [for(inc = [0:steps]) bezier3(controlpoints_left,  inc/steps)];
     points_right = [for(inc = [0:steps]) bezier3(controlpoints_right, inc/steps)];
-    P = cat(points_left, points_right);
+    P = concat(points_left, points_right);
     
     triangles_1 = [for(i=[1:steps]) [steps+i, i, steps+i+1]];
     triangles_2 = [for(i=[0:steps-1]) [i+1,  i, steps+i+1]];
-    T = cat(triangles_1, triangles_2);
+    T = concat(triangles_1, triangles_2);
     
     
     polyhedron(points=P, faces=T);
@@ -85,7 +83,7 @@ in=25.4*mm;
 
 control_thickness = 2*mm;
 
-rotate([0,8,0])
+*rotate([0,8,0])
 translate([0,0,-7.5*in])
 scale(25.4)
 rotate([0,0,90])
