@@ -1,6 +1,9 @@
 
 
-
+// compute the alternately add and multiply sequence http://oeis.org/A039941
+// 1,1,2,2,4,8,12,96,...
+//
+// it comes out backwards, but whatevs
 
 function f(a,b) = a*b;
 function g(a,b) = a+b;
