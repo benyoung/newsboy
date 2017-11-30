@@ -39,6 +39,9 @@ module line_segment(p1, p2, thickness) {
     cylinder(h=rho, r=thickness/2, $fn=16);
 }
 
+function sum(list, idx = 0, result = 0) = idx >= len(list) ? result : sum(list, idx + 1, result + list[idx]);  
+function arclength(pts, n) = sum([for(i=[0:n-1]) norm(bezier(pts, (i+1)/n) - bezier(pts, i/n))]);
+
 // 3d model of a tubular neighbourhood of a bezier curve.
 module bezier_tube(control_points, steps, thickness) {
     centers = [for(inc = [0:steps]) bezier3(control_points, inc/steps)];
@@ -95,8 +98,6 @@ head_rear_len = 4.3*in;
 head_front_len = 4.1*in;
 head_side_len = 3.3*in;
 rear_anchor = [-head_rear_len, 0,0];
-
-echo (rear_anchor);
 
 
 head_rear_control_len = 1.7*in;
@@ -171,17 +172,18 @@ bezier_tube(brim_edge_spline, 20, control_thickness);
 
 
 
-top_anchor = [-0.5*in,0,4.0*in];
+top_anchor = [-0.7*in,0*in,4.0*in];
 top_control_front_len = 3*in;
 top_control_front = top_anchor + top_control_front_len*[1,0,0];
 top_control_rear_len = 2.5*in;
 top_control_rear = top_anchor + top_control_rear_len*[-1,0,0];
 
-upper_side_anchor = top_anchor + [0*in, 2.9*in, -0.3*in];
-upper_side_rear_control_len = 2*in; // the front control len is to be the same as the top one
+upper_side_anchor = top_anchor + [0.3*in, 2.9*in, -0.5*in];
+upper_side_rear_control_len = 2*in; 
+upper_side_front_control_len = 3.8*in;
 upper_side_angle = 8;
 upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
-upper_side_control_front = upper_side_anchor + top_control_front_len*upper_side_unit_vector;
+upper_side_control_front = upper_side_anchor + upper_side_front_control_len*upper_side_unit_vector;
 upper_side_control_rear = upper_side_anchor - upper_side_rear_control_len*upper_side_unit_vector;
 
 *color("red") {
@@ -219,14 +221,14 @@ line_segment(peak_anchor, peak_control, control_thickness);
 *color("blue")
 bezier_tube(peak_spline, 20, control_thickness);
 
-peak_crest_control_offset = [-1.1*in, 0, 1.5*in];
+peak_crest_control_offset = [-1.1*in, 0, 1.7*in];
 peak_crest_control = peak_anchor + peak_crest_control_offset;
 front_crest_spline = [peak_anchor, peak_crest_control, top_control_front, top_anchor];
 front_split_t = 0.5;
 veryfront_crest_spline = left_split(front_crest_spline, front_split_t);
 mid_crest_spline = right_split(front_crest_spline, front_split_t);
 
-color("red")
+*color("red")
 line_segment(peak_anchor, peak_crest_control, control_thickness);
 
 *color("blue")
@@ -272,6 +274,7 @@ half_hat();
 mirror([0,1,0])
 half_hat();
 
+echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 
 
 
