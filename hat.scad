@@ -98,12 +98,19 @@ function construct_triangle_neg(T,a_p, b_p) = go(b_p,-angle_B(T)-standard_angle(
 function zig(Cl,Cr,t1,t2) = [bezier3(Cl,t1), bezier3(Cr,t1), bezier3(Cl,t2)];
 function zag(Cl,Cr,t1,t2) = [bezier3(Cr,t1), bezier3(Cl,t2), bezier3(Cr,t2)];
 
-// flatten out one zigzag step
-function flat_zig(Cl, Cr, t, inc, a, b) = construct_triangle_pos(zig(Cl,Cr,t1,t2),a,b);
-function flat_zag(Cl, Cr, t, inc, a, b) = construct_triangle_neg(zag(Cl,Cr,t1,t2),a,b);
+// flatten out one zig/zag step
+function flat_zig(Cl, Cr, t, inc, a, b) = construct_triangle_pos(zig(Cl,Cr,t,t+inc),a,b);
+function flat_zag(Cl, Cr, t, inc, a, b) = construct_triangle_neg(zag(Cl,Cr,t,t+inc),a,b);
 
+// Prepend one zig/zag step onto a list
+function flat_zig_extend(Cl, Cr, t, inc, L) = concat(flat_zig(Cl,Cr,t,inc,L[1],L[0]), L);
+function flat_zag_extend(Cl, Cr, t, inc, L) = concat(flat_zag(Cl,Cr,t,inc,L[1],L[0]), L);
 
+// Recursively prepend a bunch of zig/zag steps onto a list
+function zigzag(Cl, Cr, n, steps, L) = (n==steps)?L:flat_zig_extend(Cl,Cr,n/steps,1/steps,zagzig(Cl,Cr,n,steps,L));
+function zagzig(Cl, Cr, n, steps, L) = (n==steps)?L:flat_zag_extend(Cl,Cr,n/steps,1/steps,zigzag(Cl,Cr,n+1,steps,L));
 
+function flatten_zigzag_path(S_l, S_r, steps) = zigzag(S_l, S_r,0,steps,[[0, norm(S_l[0]-S_r[0])], [0,0]] );
 
 mm=1;
 cm = 10*mm;
@@ -301,7 +308,8 @@ mirror([0,1,0])
 half_hat();
 
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
+test = flatten_zigzag_path(brim_edge_spline, brim_forehead_spline,20);
 
-
+echo(test);
 
 
