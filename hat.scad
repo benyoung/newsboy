@@ -80,7 +80,7 @@ function angle_B(T) = acos((T[0]-T[1]) *(T[2]-T[1])/norm(T[0]-T[1])/norm(T[2]-T[
 function angle_C(T) = acos((T[0]-T[2]) *(T[1]-T[2])/norm(T[0]-T[2])/norm(T[1]-T[2]));
 
 // the standard angle, in plane, from point a to point b
-function standard_angle(a,b) = atan2(b[1]-a[1], b[0]-a[0]);
+function standard_angle(a,b) = (a==b)?0:atan2(b[1]-a[1], b[0]-a[0]);
 
 // lengths of sides AB,BC,AC of triangle ABC
 function len_BC(T) = norm(T[2]-T[1]);
@@ -91,26 +91,37 @@ function len_AB(T) = norm(T[1]-T[0]);
 function go(p, theta, d)= p + [cos(theta), sin(theta)]*d;
 
 // construct a triangle abc congruent to T=ABC in the plane, given pre-constructed points a, b
-function construct_triangle_pos(T,a_p, b_p) = go(b_p, angle_B(T)-standard_angle(b_p,a_p), len_BC(T));
-function construct_triangle_neg(T,a_p, b_p) = go(b_p,-angle_B(T)-standard_angle(b_p,a_p), len_BC(T));
+function construct_triangle_pos(T,a_p, b_p) = go(b_p,-angle_B(T)+standard_angle(b_p,a_p), len_BC(T));
+function construct_triangle_neg(T,a_p, b_p) = go(b_p,+angle_B(T)+standard_angle(b_p,a_p), len_BC(T));
 
 // construct a triangle by zigzagging from bezier Cl to Cr at times t1, t2
-function zig(Cl,Cr,t1,t2) = [bezier3(Cl,t1), bezier3(Cr,t1), bezier3(Cl,t2)];
-function zag(Cl,Cr,t1,t2) = [bezier3(Cr,t1), bezier3(Cl,t2), bezier3(Cr,t2)];
+function zig(Cl,Cr,t1,t2) = [bezier3(Cl,t2), bezier3(Cr,t1), bezier3(Cl,t1)];
+function zag(Cl,Cr,t1,t2) = [bezier3(Cr,t2), bezier3(Cl,t2), bezier3(Cr,t1)];
 
 // flatten out one zig/zag step
 function flat_zig(Cl, Cr, t, inc, a, b) = construct_triangle_pos(zig(Cl,Cr,t,t+inc),a,b);
 function flat_zag(Cl, Cr, t, inc, a, b) = construct_triangle_neg(zag(Cl,Cr,t,t+inc),a,b);
 
 // Prepend one zig/zag step onto a list
-function flat_zig_extend(Cl, Cr, t, inc, L) = concat(flat_zig(Cl,Cr,t,inc,L[1],L[0]), L);
-function flat_zag_extend(Cl, Cr, t, inc, L) = concat(flat_zag(Cl,Cr,t,inc,L[1],L[0]), L);
+function flat_zig_extend(Cl, Cr, t, inc, L) = concat([flat_zig(Cl,Cr,t,inc,L[1],L[0])], L);
+function flat_zag_extend(Cl, Cr, t, inc, L) = concat([flat_zag(Cl,Cr,t,inc,L[1],L[0])], L);
 
 // Recursively prepend a bunch of zig/zag steps onto a list
 function zigzag(Cl, Cr, n, steps, L) = (n==steps)?L:flat_zig_extend(Cl,Cr,n/steps,1/steps,zagzig(Cl,Cr,n,steps,L));
 function zagzig(Cl, Cr, n, steps, L) = (n==steps)?L:flat_zag_extend(Cl,Cr,n/steps,1/steps,zigzag(Cl,Cr,n+1,steps,L));
 
-function flatten_zigzag_path(S_l, S_r, steps) = zigzag(S_l, S_r,0,steps,[[0, norm(S_l[0]-S_r[0])], [0,0]] );
+function flatten_zigzag_path(S_l, S_r, steps) = zigzag(S_l, S_r,0,steps,[[0, norm(S_l[3]-S_r[3])], [0,0]] );
+
+function unzigzag(L) = concat([for(i=[1:2:len(L)-1]) L[i]],[for(i=[len(L)-2:-2:0])L[i]]);
+
+function flatten_patch(S_l, S_r, steps) = unzigzag(flatten_zigzag_path(S_l, S_r, steps));
+
+low_spline = [[20,0,0],[10,0,0],[0,10,0],[0,20,0]];
+high_spline =[[30,0,10],[20,0,5],[0,20,5],[0,20,10]];
+polygon(points=flatten_patch(low_spline, high_spline, 20));
+two_bezier_patch(low_spline, high_spline, 20);
+echo(flatten_zigzag_path(low_spline, high_spline, 20));
+
 
 mm=1;
 cm = 10*mm;
@@ -303,13 +314,13 @@ module half_hat() {
     }
 }
 
-half_hat();
+*half_hat();
 mirror([0,1,0])
-half_hat();
+*half_hat();
 
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
-test = flatten_zigzag_path(brim_edge_spline, brim_forehead_spline,20);
+//test = flatten_zigzag_path(brim_edge_spline, brim_forehead_spline,20);
 
-echo(test);
+//echo(test);
 
 
