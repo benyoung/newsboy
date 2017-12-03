@@ -126,6 +126,7 @@ function flatten_patch(S_l, S_r, steps) = unzigzag(flatten_zigzag_path(S_l, S_r,
 mm=1;
 cm = 10*mm;
 in=25.4*mm;
+eps = 0.01*mm;
 
 control_thickness = 2*mm;
 
@@ -186,7 +187,7 @@ bezier_tube(q2_brim, 20, control_thickness);
 
 brim_split_point = 0.8;
 brim_tip_offset = [1.3*in,0*in,-0.7*in];
-brim_control_width = 2.2*in;
+brim_control_width = 2*in;// 2.2*in;
 brim_temple_pull = [1*in,0*in,-0.5*in];
 
 brim_forehead_spline = left_split(q1_brim, brim_split_point);
@@ -317,21 +318,22 @@ module half_hat() {
         two_bezier_patch(mid_peak_spline, mid_crest_spline, 20);
         two_bezier_patch(rear_upperpanel_spline, rear_crest_spline, 20);
         
+        two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
         two_bezier_patch(brim_extend_spline, brim_forehead_spline,20);
     }
 }
 
+translate([0,0,2*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
-
+}
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 module flat_half_brim() {
-    pts = flatten_patch(brim_edge_spline, brim_forehead_spline,20);
+    pts = flatten_patch(brim_extend_spline, brim_forehead_spline,20);
     n = len(pts);
     last = pts[0]-pts[n-1];
-    *color("red")
-    polygon([[0,0],[1,0], last]);
+
     rotate(-atan2(last[1], last[0]))
     translate(-pts[n-1])
     polygon(pts);
@@ -343,6 +345,46 @@ module flat_brim() {
         mirror([0,1])
         flat_half_brim();
     }
-}   
+}
 
-*flat_brim();
+
+module flat_top_half() {
+    pts_f = flatten_patch(front_peak_spline, veryfront_crest_spline, 20);
+    pts_m = flatten_patch(mid_peak_spline, mid_crest_spline, 20);
+    pts_r = flatten_patch(rear_upperpanel_spline, rear_crest_spline, 20);   
+    n = len(pts_f);
+    
+    last_m = pts_m[0]-pts_m[n-1];
+    last_r = pts_r[0]-pts_r[n-1];
+    //rotate(-atan2(last_f[1], last_f[0]))
+    //translate(-pts_f[n-1])
+    union(){
+        translate(pts_m[0])
+        rotate(atan2(last_m[1], last_m[0])+90)
+        union(){
+            polygon(pts_f);
+            translate([eps,0])
+            rotate(-atan2(last_m[1], last_m[0])-90)
+            translate(-pts_m[0])
+            polygon(pts_m);
+        }
+        translate([eps,0])
+        rotate(-atan2(last_r[1], last_r[0])-90)
+        translate(-pts_r[0])
+        polygon(pts_r);
+    }
+}
+
+top_panel_fix_rot = 9.45;
+module flat_top_panel() {
+    union(){
+        rotate(-top_panel_fix_rot)
+        flat_top_half();
+        mirror([0,1])
+        rotate(-top_panel_fix_rot)
+        flat_top_half();
+    }
+}
+
+//flat_top_panel();
+//flat_brim();
