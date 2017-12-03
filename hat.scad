@@ -75,9 +75,9 @@ module two_bezier_patch(controlpoints_left, controlpoints_right, steps) {
 }
 
 // angles A,B,C in triangle ABC
-function angle_A(T) = acos((T[1]-T[0]) *(T[2]-T[0])/norm(T[1]-T[0])/norm(T[2]-T[0]));
-function angle_B(T) = acos((T[0]-T[1]) *(T[2]-T[1])/norm(T[0]-T[1])/norm(T[2]-T[1]));
-function angle_C(T) = acos((T[0]-T[2]) *(T[1]-T[2])/norm(T[0]-T[2])/norm(T[1]-T[2]));
+function angle_A(T) = ((T[1]==T[0])||(T[2]==T[0]))?0:acos((T[1]-T[0]) *(T[2]-T[0])/norm(T[1]-T[0])/norm(T[2]-T[0]));
+function angle_B(T) = ((T[1]==T[0])||(T[2]==T[1]))?0:acos((T[0]-T[1]) *(T[2]-T[1])/norm(T[0]-T[1])/norm(T[2]-T[1]));
+function angle_C(T) = ((T[0]==T[2])||(T[2]==T[1]))?0:acos((T[0]-T[2]) *(T[1]-T[2])/norm(T[0]-T[2])/norm(T[1]-T[2]));
 
 // the standard angle, in plane, from point a to point b
 function standard_angle(a,b) = (a==b)?0:atan2(b[1]-a[1], b[0]-a[0]);
@@ -116,11 +116,11 @@ function unzigzag(L) = concat([for(i=[1:2:len(L)-1]) L[i]],[for(i=[len(L)-2:-2:0
 
 function flatten_patch(S_l, S_r, steps) = unzigzag(flatten_zigzag_path(S_l, S_r, steps));
 
-low_spline = [[20,0,0],[10,0,0],[0,10,0],[0,20,0]];
-high_spline =[[30,0,10],[20,0,5],[0,20,5],[0,20,10]];
-polygon(points=flatten_patch(low_spline, high_spline, 20));
-two_bezier_patch(low_spline, high_spline, 20);
-echo(flatten_zigzag_path(low_spline, high_spline, 20));
+//low_spline = [[20,0,0],[10,0,0],[0,10,0],[0,20,0]];
+//high_spline =[[30,0,10],[20,0,5],[0,20,5],[0,20,10]];
+//polygon(points=flatten_patch(low_spline, high_spline, 20));
+//two_bezier_patch(low_spline, high_spline, 20);
+//echo(flatten_zigzag_path(low_spline, high_spline, 20));
 
 
 mm=1;
@@ -319,8 +319,8 @@ mirror([0,1,0])
 *half_hat();
 
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
-//test = flatten_zigzag_path(brim_edge_spline, brim_forehead_spline,20);
+flatten_patch(brim_edge_spline, brim_forehead_spline,20);
 
-//echo(test);
-
+echo(test);
+two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
 
