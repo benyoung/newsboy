@@ -185,7 +185,7 @@ q2_brim = [side_anchor, side_control_rear, rear_control, rear_anchor];
 bezier_tube(q2_brim, 20, control_thickness);
 
 brim_split_point = 0.8;
-brim_tip_offset = [1.3*in,0*in,-1*in];
+brim_tip_offset = [1.3*in,0*in,-0.7*in];
 brim_control_width = 2.2*in;
 brim_temple_pull = [1*in,0*in,-0.5*in];
 
@@ -194,9 +194,15 @@ brim_side_spline = right_split(q1_brim, brim_split_point);
 *color("blue")
 bezier_tube(brim_forehead_spline, 20, control_thickness);
 
-brim_anchor = brim_forehead_spline[0] + brim_tip_offset;
+
+
+brim_extend_anchor = brim_forehead_spline[0] + brim_tip_offset;
+
+brim_anchor = avg(brim_extend_anchor, front_anchor, 0.2);
 brim_temple_anchor = brim_forehead_spline[3];
 brim_temple_control = brim_temple_anchor + brim_temple_pull;
+
+brim_extend_control = brim_extend_anchor + [0,brim_control_width,0];
 
 brim_control = brim_anchor + [0,brim_control_width,0];
 *color("red") {
@@ -209,6 +215,7 @@ brim_control = brim_anchor + [0,brim_control_width,0];
 }
 
 brim_edge_spline = [brim_anchor, brim_control, brim_temple_control, brim_temple_anchor];
+brim_extend_spline = [brim_extend_anchor, brim_extend_control, brim_temple_control, brim_temple_anchor];
 *color("blue")
 bezier_tube(brim_edge_spline, 20, control_thickness);
     
@@ -244,7 +251,7 @@ upper_side_control_rear = upper_side_anchor - upper_side_rear_control_len*upper_
     line_segment(upper_side_control_rear, upper_side_control_front, control_thickness);
 }
 
-peak_lift = [0.1*in, 0, 0.6*in];
+peak_lift = [0.1*in, 0, 0.4*in];
 
 peak_anchor = brim_edge_spline[0] + peak_lift;
 peak_control_stretch = 1.6;
@@ -310,17 +317,32 @@ module half_hat() {
         two_bezier_patch(mid_peak_spline, mid_crest_spline, 20);
         two_bezier_patch(rear_upperpanel_spline, rear_crest_spline, 20);
         
-        two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
+        two_bezier_patch(brim_extend_spline, brim_forehead_spline,20);
     }
 }
 
-*half_hat();
+half_hat();
 mirror([0,1,0])
-*half_hat();
+half_hat();
 
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
-flatten_patch(brim_edge_spline, brim_forehead_spline,20);
+module flat_half_brim() {
+    pts = flatten_patch(brim_edge_spline, brim_forehead_spline,20);
+    n = len(pts);
+    last = pts[0]-pts[n-1];
+    *color("red")
+    polygon([[0,0],[1,0], last]);
+    rotate(-atan2(last[1], last[0]))
+    translate(-pts[n-1])
+    polygon(pts);
+}
+module flat_brim() {
+    union(){
+        flat_half_brim();
+        translate([0,-eps])
+        mirror([0,1])
+        flat_half_brim();
+    }
+}   
 
-echo(test);
-two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
-
+*flat_brim();
