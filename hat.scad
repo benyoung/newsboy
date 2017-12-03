@@ -329,6 +329,8 @@ mirror([0,1,0])
 half_hat();
 }
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
+
+
 module flat_half_brim() {
     pts = flatten_patch(brim_extend_spline, brim_forehead_spline,20);
     n = len(pts);
@@ -338,6 +340,18 @@ module flat_half_brim() {
     translate(-pts[n-1])
     polygon(pts);
 }
+
+module flat_hidden_bit() {
+    pts = flatten_patch(brim_edge_spline, brim_forehead_spline,20);
+    n = len(pts);
+    last = pts[0]-pts[n-1];
+
+    rotate(-atan2(last[1], last[0]))
+    translate(-pts[n-1])
+    polygon(pts);
+    
+}
+
 module flat_brim() {
     union(){
         flat_half_brim();
@@ -386,5 +400,62 @@ module flat_top_panel() {
     }
 }
 
-//flat_top_panel();
-//flat_brim();
+
+module flat_side() {
+    pts_f = flatten_patch(brim_edge_spline, front_peak_spline, 20);
+    pts_m = flatten_patch(brim_side_spline, mid_peak_spline, 20);
+    pts_r = flatten_patch(rear_mid_spline, rear_upperpanel_spline, 20);   
+  
+    n = len(pts_f);
+    
+    last_m = pts_m[0]-pts_m[n-1];
+    last_r = pts_r[0]-pts_r[n-1];
+
+    union(){
+        translate(pts_m[0])
+        rotate(atan2(last_m[1], last_m[0])+90)
+        union(){
+            polygon(pts_f);
+            translate([eps,0])
+            rotate(-atan2(last_m[1], last_m[0])-90)
+            translate(-pts_m[0])
+            polygon(pts_m);
+        }
+        translate([eps,0])
+        rotate(-atan2(last_r[1], last_r[0])-90)
+        translate(-pts_r[0])
+        polygon(pts_r);
+
+    }
+    
+}
+
+seam_allowance = 0.5*in;
+translate([0,5*in])
+difference() {
+    offset(r=seam_allowance)
+    flat_side();
+    flat_side();
+}
+
+translate([0,-5*in])
+difference() {
+    offset(r=seam_allowance)
+    flat_top_panel();
+    flat_top_panel();
+}
+
+rotate(90)
+difference(){
+    offset(r=seam_allowance)
+    flat_brim();
+    flat_brim();
+}
+
+translate([0,10*in])
+rotate(90)
+difference(){
+    offset(r=seam_allowance)
+    flat_hidden_bit();
+    flat_hidden_bit();
+}
