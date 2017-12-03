@@ -146,9 +146,9 @@ rear_anchor = [-head_rear_len, 0,0];
 
 
 head_rear_control_len = 1.7*in;
-head_front_control_len = 2.1*in;
+head_front_control_len = 2.4*in;
 head_side_control_rear_len = 2.8*in;
-head_side_control_front_len = 2.5*in;
+head_side_control_front_len = 2.2*in;
 head_side_control_angle = 3;
 
 
@@ -186,8 +186,8 @@ q2_brim = [side_anchor, side_control_rear, rear_control, rear_anchor];
 bezier_tube(q2_brim, 20, control_thickness);
 
 brim_split_point = 0.8;
-brim_tip_offset = [1.3*in,0*in,-0.7*in];
-brim_control_width = 2*in;// 2.2*in;
+brim_tip_offset = [1.8*in,0*in,-0.7*in];
+brim_control_width = 2.9*in;
 brim_temple_pull = [1*in,0*in,-0.5*in];
 
 brim_forehead_spline = left_split(q1_brim, brim_split_point);
@@ -224,7 +224,7 @@ bezier_tube(brim_edge_spline, 20, control_thickness);
 
 
 
-top_anchor = [-0.7*in,0*in,4.0*in];
+top_anchor = [-0.7*in,0*in,4.4*in];
 top_control_front_len = 3*in;
 top_control_front = top_anchor + top_control_front_len*[1,0,0];
 top_control_rear_len = 2.5*in;
@@ -252,10 +252,10 @@ upper_side_control_rear = upper_side_anchor - upper_side_rear_control_len*upper_
     line_segment(upper_side_control_rear, upper_side_control_front, control_thickness);
 }
 
-peak_lift = [0.1*in, 0, 0.4*in];
+peak_lift = [0.1*in, 0, 0.7*in];
 
 peak_anchor = brim_edge_spline[0] + peak_lift;
-peak_control_stretch = 1.6;
+peak_control_stretch = 1.3;
 peak_control = peak_control_stretch * [0,brim_control_width,0] + peak_anchor;
 peak_spline = [peak_anchor, peak_control, upper_side_control_front, upper_side_anchor];
 
@@ -323,7 +323,7 @@ module half_hat() {
     }
 }
 
-translate([0,0,2*in]) {
+*translate([0,0,2*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
@@ -341,7 +341,7 @@ module flat_half_brim() {
     polygon(pts);
 }
 
-module flat_hidden_bit() {
+module flat_half_hidden_bit() {
     pts = flatten_patch(brim_edge_spline, brim_forehead_spline,20);
     n = len(pts);
     last = pts[0]-pts[n-1];
@@ -351,7 +351,14 @@ module flat_hidden_bit() {
     polygon(pts);
     
 }
-
+module flat_hidden_bit() {
+    union(){
+        flat_half_hidden_bit();
+        translate([0,-eps])
+        mirror([0,1])
+        flat_half_hidden_bit();
+    }
+}
 module flat_brim() {
     union(){
         flat_half_brim();
@@ -431,31 +438,41 @@ module flat_side() {
 }
 
 seam_allowance = 0.5*in;
-translate([0,5*in])
+translate([1*in,8.5*in])
+rotate(35)
 difference() {
     offset(r=seam_allowance)
     flat_side();
     flat_side();
 }
 
-translate([0,-5*in])
-difference() {
-    offset(r=seam_allowance)
-    flat_top_panel();
-    flat_top_panel();
+translate([2*in,-8*in])
+rotate(90)
+union(){
+   
+    square(4*in);
+    translate([-1*in,2*in])
+    difference() {
+        offset(r=seam_allowance)
+        flat_top_panel();
+        flat_top_panel();
+    }
 }
 
-rotate(90)
+translate([0,3*in])
+rotate(-90)
 difference(){
     offset(r=seam_allowance)
     flat_brim();
     flat_brim();
 }
 
-translate([0,10*in])
-rotate(90)
+translate([0,6.5*in])
+rotate(-90)
 difference(){
     offset(r=seam_allowance)
     flat_hidden_bit();
     flat_hidden_bit();
 }
+
+
