@@ -193,8 +193,8 @@ bezier_tube(q2_brim, 20, control_thickness);
 
 brim_split_point = 0.8;
 brim_length = 2.3*in;
-brim_angle = 51;
-brim_inv_angle = -15;
+brim_angle = 45;
+brim_inv_angle = -45;
 brim_control_width = 2.9*in;
 brim_temple_pull_length = 1.3*in;
 
@@ -472,8 +472,8 @@ module flat_side() {
 
 
 
-seam_allowance = 0.25*in;
-translate([5.4*in,4.5*in])
+seam_allowance = 0.5*in;
+translate([4*in,4.5*in])
 rotate(83)
 difference() {
     offset(r=seam_allowance)
@@ -481,7 +481,7 @@ difference() {
     flat_side();
 }
 
-translate([6.6*in,4.5*in])
+translate([8*in,4.5*in])
 mirror([0,1])
 rotate(83+180)
 difference() {
@@ -496,7 +496,7 @@ translate([4.0*in,16.5*in])
 rotate(-90)
 union(){
    
-    square(4*in);
+    *square(4*in);
     translate([-1*in,2*in])
     difference() {
         offset(r=seam_allowance)
@@ -524,6 +524,6 @@ difference(){
 }
 
 */
-translate([0,0,-0.15*in])
+*translate([0,0,-0.15*in])
 color("green")
 cube([12*in, 24*in,0.1*in]);
