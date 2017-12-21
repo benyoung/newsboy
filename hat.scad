@@ -14,7 +14,7 @@ control_thickness = 3*mm;
 
 // I think this model was based on inches as the dimensionless unit
 // at least it is consistent with an average male interpupillary distance of 64mm
-rotate([0,8,0])
+*rotate([0,8,0])
 translate([0,0,-7.5*in])
 scale(25.4)
 rotate([0,0,90])
@@ -154,7 +154,7 @@ echo(rear_crest_control_raw, rear_crest_control);
 rear_crest_spline = [top_anchor, top_control_rear, rear_crest_control, rear_anchor];
 
 
-rear_split_t = 0.7;
+rear_split_t = 0.65;
 rear_edge_spline = right_split(q2_brim, rear_split_t);
 rear_mid_spline = left_split(q2_brim, rear_split_t);
 
@@ -216,7 +216,7 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = 9.45;
+top_panel_fix_rot = 0.4;
 module flat_top_panel() {
     union(){
         rotate(-top_panel_fix_rot)
@@ -260,19 +260,19 @@ module flat_side() {
 
 
 // pattern pieces with layout
-*union(){
+union(){
     seam_allowance = 0.5*in;
-    translate([4*in,4.5*in])
-    rotate(83)
+    translate([5.3*in,-12*in])
+    rotate(52.5)
     difference() {
         offset(r=seam_allowance)
         flat_side();
         flat_side();
     }
     
-    translate([8*in,4.5*in])
+    translate([10.6*in,-4*in])
     mirror([0,1])
-    rotate(83+180)
+    rotate(52.5)
     difference() {
         offset(r=seam_allowance)
         flat_side();
@@ -292,14 +292,23 @@ module flat_side() {
         }
     }
     
-    for(trans=[-1*in,-5*in])
-    translate([4*in,trans])
-    rotate(-90)
+    
+    translate([2.5*in,5.5*in])
+    rotate(60)
     difference(){
         offset(r=seam_allowance)
         flat_brim();
         flat_brim();
     }
+    
+    translate([9.7*in,3.3*in])
+    rotate(135)
+    difference(){
+        offset(r=seam_allowance)
+        flat_brim();
+        flat_brim();
+    }
+
 }
 
 /* 2 foot by 1 foot cut bed */
@@ -325,11 +334,11 @@ module half_hat() {
         two_bezier_patch(rear_upperpanel_spline, rear_crest_spline, 20);
         
  //       two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
-        two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
+ //       two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
     }
 }
 
-translate([0,0,0*in]) {
+*translate([0,0,0*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
@@ -337,7 +346,7 @@ half_hat();
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 
 // anchor points and handles
-color("red") {
+*color("red") {
     line_segment(rear_control, rear_anchor, control_thickness);
     line_segment(front_control, front_anchor, control_thickness);
     line_segment(side_control_rear, side_control_front, control_thickness);
@@ -361,14 +370,14 @@ color("red") {
 
 // bezier tubes / wireframe for hat
 
-color("pink") {
+*color("pink") {
     bezier_tube(q1_brim, 20, control_thickness);
     bezier_tube(q2_brim, 20, control_thickness);
     bezier_tube(brim_forehead_spline, 20, control_thickness);
     *bezier_tube(brim_edge_spline, 20, control_thickness);
     *bezier_tube(brim_extend_spline, 20, control_thickness);
     *bezier_tube(brim_inv_edge_spline, 20, control_thickness);
-    bezier_tube(brim_inv_extend_spline, 20, control_thickness);
+    *bezier_tube(brim_inv_extend_spline, 20, control_thickness);
     bezier_tube(peak_spline, 20, control_thickness);
     bezier_tube(front_crest_spline, 20, control_thickness);
     bezier_tube(rear_crest_spline, 20, control_thickness);
