@@ -53,7 +53,7 @@ brim_split_point = 0.8;
 brim_length = 2.3*in;
 brim_angle = 45;
 brim_inv_angle = -45;
-brim_control_width = 2.9*in;
+brim_control_width = 3.8*in;
 brim_temple_pull_length = 1.3*in;
 brim_tip_offset = brim_length * [cos(brim_angle),0,sin(brim_angle)];
 brim_temple_pull = brim_temple_pull_length * [cos(brim_angle/2), 0, sin(brim_angle/2)];
@@ -109,10 +109,10 @@ top_control_front = rotate_around_line(top_control_front_raw, rear_inversion_ang
 
 
 
-upper_side_anchor_raw = top_anchor + [0.9*in, 2.6*in, -2*in];
+upper_side_anchor_raw = top_anchor + [0.9*in, 3.2*in, -2.5*in];
 upper_side_rear_control_len = 2*in; 
-upper_side_front_control_len = 3.8*in;
-upper_side_angle = 8;
+upper_side_front_control_len = 3.*in;
+upper_side_angle = 13;
 upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
 upper_side_control_front_raw = upper_side_anchor_raw + upper_side_front_control_len*upper_side_unit_vector;
 upper_side_control_rear_raw = upper_side_anchor_raw - upper_side_rear_control_len*upper_side_unit_vector;
@@ -127,7 +127,7 @@ upper_side_control_rear = rotate_around_line(upper_side_control_rear_raw, rear_i
 peak_lift = [0*in, 0*in, 0*in];
 
 peak_anchor = brim_edge_spline[0] + peak_lift;
-peak_control_stretch = 1.2;
+peak_control_stretch = 1.3;
 peak_control = peak_control_stretch * [0,brim_control_width,0] + peak_anchor;
 peak_spline = [peak_anchor, peak_control, upper_side_control_front, upper_side_anchor];
 
@@ -216,8 +216,8 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = 0.4;
-module flat_top_panel() {
+top_panel_fix_rot = 5.3;
+module flat_top_panel(){
     union(){
         rotate(-top_panel_fix_rot)
         flat_top_half();
@@ -258,28 +258,30 @@ module flat_side() {
 }
 
 
+seam_allowance = 0.5*in;
+foot_width = 
 
 // pattern pieces with layout
 union(){
-    seam_allowance = 0.5*in;
-    translate([5.3*in,-12*in])
-    rotate(52.5)
+    
+    translate([5.7*in,-10.6*in])
+    rotate(53)
     difference() {
         offset(r=seam_allowance)
         flat_side();
         flat_side();
     }
     
-    translate([10.6*in,-4*in])
+    translate([10.7*in,-4.5*in])
     mirror([0,1])
-    rotate(52.5)
+    rotate(53)
     difference() {
         offset(r=seam_allowance)
         flat_side();
         flat_side();
     }
        
-    translate([4.0*in,16.5*in])
+    translate([4.0*in,17*in])
     rotate(-90)
     union(){
        
@@ -293,29 +295,32 @@ union(){
     }
     
     
-    translate([2.5*in,5.5*in])
-    rotate(60)
+    translate([6.0*in,5.2*in])
+    rotate(90)
+    difference(){
+        offset(r=seam_allowance)
+        flat_brim();
+        flat_brim();
+    }
+    translate([6.0*in,1.3*in])
+    rotate(90)
     difference(){
         offset(r=seam_allowance)
         flat_brim();
         flat_brim();
     }
     
-    translate([9.7*in,3.3*in])
-    rotate(135)
-    difference(){
-        offset(r=seam_allowance)
-        flat_brim();
-        flat_brim();
-    }
+
 
 }
 
 /* 2 foot by 1 foot cut bed */
-*translate([0,0,-0.15*in])
+translate([0,0,-0.15*in])
 color("green")
 cube([12*in, 24*in,0.1*in]);
-
+color("cyan")
+translate([0,-24*in,-0.15*in])
+cube([12*in, 24*in,0.1*in]);
 
 
 
@@ -334,7 +339,7 @@ module half_hat() {
         two_bezier_patch(rear_upperpanel_spline, rear_crest_spline, 20);
         
  //       two_bezier_patch(brim_edge_spline, brim_forehead_spline,20);
- //       two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
+        two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
     }
 }
 
@@ -354,10 +359,10 @@ echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "
     line_segment(brim_control, brim_anchor, control_thickness);
     line_segment(peak_anchor, peak_control, control_thickness);
     line_segment(peak_anchor, peak_crest_control, control_thickness);
-    line_segment(upper_side_control_rear, upper_side_control_front, control_thickness); // needs rotating
-    line_segment(top_control_rear, top_control_front, control_thickness); // needs rotating
+    line_segment(upper_side_control_rear, upper_side_control_front, control_thickness); 
+    line_segment(top_control_rear, top_control_front, control_thickness); 
     
-    translate(top_anchor) node(); // needs rotating
+    translate(top_anchor) node(); 
     translate(mid_peak_spline[0]) node();
     translate(rear_split_point) node();
     translate(upper_side_anchor) node();
