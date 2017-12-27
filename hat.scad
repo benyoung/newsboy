@@ -259,7 +259,8 @@ module flat_side() {
 
 
 seam_allowance = 0.5*in;
-foot_width = 
+stich_line_offset = 0.54*in / 2; // the width of my sewing machine foot
+
 
 // pattern pieces with layout
 union(){
@@ -269,6 +270,7 @@ union(){
     difference() {
         offset(r=seam_allowance)
         flat_side();
+        offset(r=stich_line_offset)
         flat_side();
     }
     
@@ -278,6 +280,7 @@ union(){
     difference() {
         offset(r=seam_allowance)
         flat_side();
+        offset(r=stich_line_offset)
         flat_side();
     }
        
@@ -290,6 +293,7 @@ union(){
         difference() {
             offset(r=seam_allowance)
             flat_top_panel();
+            offset(r=stich_line_offset)
             flat_top_panel();
         }
     }
@@ -300,6 +304,7 @@ union(){
     difference(){
         offset(r=seam_allowance)
         flat_brim();
+        offset(r=stich_line_offset)
         flat_brim();
     }
     translate([6.0*in,1.3*in])
@@ -307,6 +312,7 @@ union(){
     difference(){
         offset(r=seam_allowance)
         flat_brim();
+        offset(r=stich_line_offset)
         flat_brim();
     }
     
