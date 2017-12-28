@@ -320,6 +320,7 @@ union(){
 
 }
 
+
 /* 2 foot by 1 foot cut bed */
 translate([0,0,-0.15*in])
 color("green")
@@ -328,7 +329,15 @@ color("cyan")
 translate([0,-24*in,-0.15*in])
 cube([12*in, 24*in,0.1*in]);
 
-
+/* measurements to see how much fabric we actually need */
+measure_1 = 16*in;
+measure_2 = 16*in;
+translate([0,24*in-measure_1,-0.10*in])
+color("red")
+cube([12*in, measure_1,0.1*in]);
+translate([0,-measure_2,-0.10*in])
+color("blue")
+cube([12*in, measure_2,0.1*in]);
 
 
 /* bezier patches for preview */
