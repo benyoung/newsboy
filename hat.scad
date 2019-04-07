@@ -51,8 +51,8 @@ q1_brim = [front_anchor, front_control, side_control_front, side_anchor];
 q2_brim = [side_anchor, side_control_rear, rear_control, rear_anchor];
 brim_split_point = 0.8;
 brim_length = 2.3*in;
-brim_angle = 45;
-brim_inv_angle = -45;
+brim_angle = 0;
+brim_inv_angle = -35;
 brim_control_width = 3.8*in;
 brim_temple_pull_length = 1.3*in;
 brim_tip_offset = brim_length * [cos(brim_angle),0,sin(brim_angle)];
@@ -216,11 +216,14 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = 5.3;
+top_panel_fix_rot = 23;
+top_panel_sep = 25*mm;
 module flat_top_panel(){
     union(){
+        translate([0,top_panel_sep])
         rotate(-top_panel_fix_rot)
         flat_top_half();
+        translate([top_panel_sep])
         mirror([0,1])
         rotate(-top_panel_fix_rot)
         flat_top_half();
@@ -262,6 +265,8 @@ seam_allowance = 0.5*in;
 stich_line_offset = 0.54*in / 2; // the width of my sewing machine foot
 
 
+
+
 // pattern pieces with layout
 union(){
     
@@ -284,7 +289,7 @@ union(){
         flat_side();
     }
        
-    translate([4.0*in,17*in])
+    translate([4.0*in,20*in])
     rotate(-90)
     union(){
        
@@ -299,7 +304,7 @@ union(){
     }
     
     
-    translate([6.0*in,5.2*in])
+    translate([6.0*in,6*in])
     rotate(90)
     difference(){
         offset(r=seam_allowance)
@@ -322,14 +327,16 @@ union(){
 
 
 /* 2 foot by 1 foot cut bed */
+/*
 translate([0,0,-0.15*in])
 color("green")
 cube([12*in, 24*in,0.1*in]);
 color("cyan")
 translate([0,-24*in,-0.15*in])
 cube([12*in, 24*in,0.1*in]);
-
+*/
 /* measurements to see how much fabric we actually need */
+/*
 measure_1 = 16*in;
 measure_2 = 16*in;
 translate([0,24*in-measure_1,-0.10*in])
@@ -338,7 +345,7 @@ cube([12*in, measure_1,0.1*in]);
 translate([0,-measure_2,-0.10*in])
 color("blue")
 cube([12*in, measure_2,0.1*in]);
-
+*/
 
 /* bezier patches for preview */
 
