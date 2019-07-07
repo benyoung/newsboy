@@ -14,7 +14,7 @@ control_thickness = 3*mm;
 
 // I think this model was based on inches as the dimensionless unit
 // at least it is consistent with an average male interpupillary distance of 64mm
-*rotate([0,8,0])
+rotate([0,8,0])
 translate([0,0,-7.5*in])
 scale(25.4)
 rotate([0,0,90])
@@ -338,7 +338,7 @@ module half_hat() {
     }
 }
 
-*translate([0,0,0*in]) {
+translate([0,0,0*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
@@ -346,7 +346,7 @@ half_hat();
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 
 // anchor points and handles
-*color("red") {
+color("red") {
     line_segment(rear_control, rear_anchor, control_thickness);
     line_segment(front_control, front_anchor, control_thickness);
     line_segment(side_control_rear, side_control_front, control_thickness);
@@ -370,14 +370,14 @@ echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "
 
 // bezier tubes / wireframe for hat
 
-*color("pink") {
+color("pink") {
     bezier_tube(q1_brim, 20, control_thickness);
     bezier_tube(q2_brim, 20, control_thickness);
     bezier_tube(brim_forehead_spline, 20, control_thickness);
-    *bezier_tube(brim_edge_spline, 20, control_thickness);
-    *bezier_tube(brim_extend_spline, 20, control_thickness);
-    *bezier_tube(brim_inv_edge_spline, 20, control_thickness);
-    *bezier_tube(brim_inv_extend_spline, 20, control_thickness);
+    bezier_tube(brim_edge_spline, 20, control_thickness);
+    bezier_tube(brim_extend_spline, 20, control_thickness);
+    bezier_tube(brim_inv_edge_spline, 20, control_thickness);
+    bezier_tube(brim_inv_extend_spline, 20, control_thickness);
     bezier_tube(peak_spline, 20, control_thickness);
     bezier_tube(front_crest_spline, 20, control_thickness);
     bezier_tube(rear_crest_spline, 20, control_thickness);

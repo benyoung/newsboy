@@ -41,7 +41,7 @@ module line_segment(p1, p2, thickness) {
     theta = acos(v[2]/rho);
     phi = atan2(v[1], v[0]);
     
-    *translate(p1)
+    translate(p1)
     rotate([0,0,phi])
     rotate([0,theta,0])
     cylinder(h=rho, r=thickness/2, $fn=16);
@@ -55,7 +55,7 @@ module bezier_tube(control_points, steps, thickness) {
     centers = [for(inc = [0:steps]) bezier3(control_points, inc/steps)];
 
     color("pink")
-    *union(){
+    union(){
         for(i= [0:steps-1]) {
             line_segment(centers[i], centers[i+1], thickness);
             translate(centers[i])
