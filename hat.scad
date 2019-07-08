@@ -28,7 +28,7 @@ head_front_len = 4.1*in;
 head_side_len = 3.3*in;
 rear_anchor = [-head_rear_len, 0,0];
 
-head_rear_control_len = 1.7*in;
+head_rear_control_len = 2.2*in;
 head_front_control_len = 2.4*in;
 head_side_control_rear_len = 2.8*in;
 head_side_control_front_len = 2.2*in;
@@ -50,11 +50,11 @@ side_control_front = side_anchor + side_unit_vector*head_side_control_front_len;
 q1_brim = [front_anchor, front_control, side_control_front, side_anchor];
 q2_brim = [side_anchor, side_control_rear, rear_control, rear_anchor];
 brim_split_point = 0.8;
-brim_length = 2.3*in;
-brim_angle = 0;
+brim_length = 2.7*in;
+brim_angle = -35;
 brim_inv_angle = -35;
-brim_control_width = 3.8*in;
-brim_temple_pull_length = 1.3*in;
+brim_control_width = 4.1*in;
+brim_temple_pull_length = 1.7*in;
 brim_tip_offset = brim_length * [cos(brim_angle),0,sin(brim_angle)];
 brim_temple_pull = brim_temple_pull_length * [cos(brim_angle/2), 0, sin(brim_angle/2)];
 brim_inv_tip_offset = brim_length * [cos(brim_inv_angle),0,sin(brim_inv_angle)];
@@ -96,7 +96,7 @@ rear_inversion_angle = angle_B([brim_extend_anchor, rear_anchor, brim_inv_extend
 
 echo("rear inversion angle", rear_inversion_angle);
 
-top_anchor_raw = [-0.7*in,0*in,4.6*in];
+top_anchor_raw = [-0.3*in,0*in,4.2*in];
 top_control_front_len = 3*in;
 top_control_front_raw = top_anchor_raw + top_control_front_len*[1,0,0];
 top_control_rear_len = 2.5*in;
@@ -109,10 +109,10 @@ top_control_front = rotate_around_line(top_control_front_raw, rear_inversion_ang
 
 
 
-upper_side_anchor_raw = top_anchor + [0.9*in, 3.2*in, -2.5*in];
+upper_side_anchor_raw = top_anchor + [0.3*in, 3.2*in, -1.1*in];
 upper_side_rear_control_len = 2*in; 
-upper_side_front_control_len = 3.*in;
-upper_side_angle = 13;
+upper_side_front_control_len = 3.5*in;
+upper_side_angle = 8;
 upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
 upper_side_control_front_raw = upper_side_anchor_raw + upper_side_front_control_len*upper_side_unit_vector;
 upper_side_control_rear_raw = upper_side_anchor_raw - upper_side_rear_control_len*upper_side_unit_vector;
@@ -127,7 +127,7 @@ upper_side_control_rear = rotate_around_line(upper_side_control_rear_raw, rear_i
 peak_lift = [0*in, 0*in, 0*in];
 
 peak_anchor = brim_edge_spline[0] + peak_lift;
-peak_control_stretch = 1.3;
+peak_control_stretch = 1.0;
 peak_control = peak_control_stretch * [0,brim_control_width,0] + peak_anchor;
 peak_spline = [peak_anchor, peak_control, upper_side_control_front, upper_side_anchor];
 
