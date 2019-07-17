@@ -14,7 +14,7 @@ control_thickness = 3*mm;
 
 // I think this model was based on inches as the dimensionless unit
 // at least it is consistent with an average male interpupillary distance of 64mm
-rotate([0,8,0])
+*rotate([0,8,0])
 translate([0,0,-7.5*in])
 scale(25.4)
 rotate([0,0,90])
@@ -109,9 +109,9 @@ top_control_front = rotate_around_line(top_control_front_raw, rear_inversion_ang
 
 
 
-upper_side_anchor_raw = top_anchor + [0.3*in, 3.2*in, -1.1*in];
-upper_side_rear_control_len = 2*in; 
-upper_side_front_control_len = 3.5*in;
+upper_side_anchor_raw = top_anchor + [-0.3*in, 3.0*in, -0.2*in];
+upper_side_rear_control_len = 2.5*in; 
+upper_side_front_control_len = 4.8*in;
 upper_side_angle = 8;
 upper_side_unit_vector = [cos(upper_side_angle), sin(upper_side_angle), 0];
 upper_side_control_front_raw = upper_side_anchor_raw + upper_side_front_control_len*upper_side_unit_vector;
@@ -135,8 +135,9 @@ peak_split_t = 0.6;
 front_peak_spline = left_split(peak_spline, peak_split_t);
 mid_peak_spline = right_split(peak_spline, peak_split_t);
 
+peak_flatten_angle = -40;
 peak_crest_control_length = 2*in;
-peak_crest_control_offset = peak_crest_control_length * [-sin(brim_angle), 0, cos(brim_angle)];
+peak_crest_control_offset = peak_crest_control_length * [sin(peak_flatten_angle-brim_angle), 0, cos(peak_flatten_angle-brim_angle)];
 peak_crest_control = peak_anchor + peak_crest_control_offset;
 front_crest_spline = [peak_anchor, peak_crest_control, top_control_front, top_anchor];
 front_split_t = 0.5;
@@ -216,8 +217,10 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = 23;
-top_panel_sep = 25*mm;
+top_panel_fix_rot = -3.7;
+top_panel_sep = -2*mm;
+nose_fix_rad = 80*mm;
+nose_fix_offset = [165*mm,10*mm];
 module flat_top_panel(){
     union(){
         translate([0,top_panel_sep])
@@ -227,6 +230,7 @@ module flat_top_panel(){
         mirror([0,1])
         rotate(-top_panel_fix_rot)
         flat_top_half();
+       
     }
 }
 
@@ -261,8 +265,8 @@ module flat_side() {
 }
 
 
-seam_allowance = 0.5*in;
-stich_line_offset = 0.54*in / 2; // the width of my sewing machine foot
+seam_allowance = 0.25*in;
+stich_line_offset = 0;// 0.54*in / 2; i forget why i did this but it sucks
 
 
 
@@ -270,8 +274,9 @@ stich_line_offset = 0.54*in / 2; // the width of my sewing machine foot
 // pattern pieces with layout
 union(){
     
-    translate([5.7*in,-10.6*in])
-    rotate(53)
+    translate([11*in,4.4*in])
+    rotate(250)
+    mirror([0,1])
     difference() {
         offset(r=seam_allowance)
         flat_side();
@@ -279,18 +284,10 @@ union(){
         flat_side();
     }
     
-    translate([10.7*in,-4.5*in])
-    mirror([0,1])
-    rotate(53)
-    difference() {
-        offset(r=seam_allowance)
-        flat_side();
-        offset(r=stich_line_offset)
-        flat_side();
-    }
+
        
-    translate([4.0*in,20*in])
-    rotate(-90)
+    translate([1.7*in,13*in])
+    rotate(-85)
     union(){
        
         *square(4*in);
@@ -304,16 +301,9 @@ union(){
     }
     
     
-    translate([6.0*in,6*in])
-    rotate(90)
-    difference(){
-        offset(r=seam_allowance)
-        flat_brim();
-        offset(r=stich_line_offset)
-        flat_brim();
-    }
-    translate([6.0*in,1.3*in])
-    rotate(90)
+
+    translate([10.0*in,21*in])
+    rotate(210)
     difference(){
         offset(r=seam_allowance)
         flat_brim();
@@ -365,7 +355,7 @@ module half_hat() {
     }
 }
 
-translate([0,0,0*in]) {
+*translate([0,0,0*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
@@ -373,7 +363,7 @@ half_hat();
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 
 // anchor points and handles
-color("red") {
+*color("red") {
     line_segment(rear_control, rear_anchor, control_thickness);
     line_segment(front_control, front_anchor, control_thickness);
     line_segment(side_control_rear, side_control_front, control_thickness);
@@ -397,7 +387,7 @@ color("red") {
 
 // bezier tubes / wireframe for hat
 
-color("pink") {
+*color("pink") {
     bezier_tube(q1_brim, 20, control_thickness);
     bezier_tube(q2_brim, 20, control_thickness);
     bezier_tube(brim_forehead_spline, 20, control_thickness);
