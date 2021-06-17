@@ -15,7 +15,7 @@ control_thickness = 3*mm;
 // I think this model was based on inches as the dimensionless unit
 // at least it is consistent with an average male interpupillary distance of 64mm
 *rotate([0,8,0])
-translate([0,0,-7.5*in])
+translate([0,0,-7*in])
 scale(25.4)
 rotate([0,0,90])
 import("HeadStand.STL");  
@@ -96,7 +96,7 @@ rear_inversion_angle = angle_B([brim_extend_anchor, rear_anchor, brim_inv_extend
 
 echo("rear inversion angle", rear_inversion_angle);
 
-top_anchor_raw = [-0.3*in,0*in,4.2*in];
+top_anchor_raw = [-0.3*in,0*in,4.4*in];
 top_control_front_len = 3*in;
 top_control_front_raw = top_anchor_raw + top_control_front_len*[1,0,0];
 top_control_rear_len = 2.5*in;
@@ -217,7 +217,7 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = -3.7;
+top_panel_fix_rot = -3.4;
 top_panel_sep = -2*mm;
 nose_fix_rad = 80*mm;
 nose_fix_offset = [165*mm,10*mm];
@@ -226,7 +226,7 @@ module flat_top_panel(){
         translate([0,top_panel_sep])
         rotate(-top_panel_fix_rot)
         flat_top_half();
-        translate([top_panel_sep])
+        translate([0,top_panel_sep])
         mirror([0,1])
         rotate(-top_panel_fix_rot)
         flat_top_half();
@@ -274,7 +274,7 @@ stich_line_offset = 0;// 0.54*in / 2; i forget why i did this but it sucks
 // pattern pieces with layout
 union(){
     
-    translate([11*in,4.4*in])
+    translate([11*in,4.2*in])
     rotate(250)
     mirror([0,1])
     difference() {
@@ -317,14 +317,15 @@ union(){
 
 
 /* 2 foot by 1 foot cut bed */
-/*
+*
 translate([0,0,-0.15*in])
 color("green")
 cube([12*in, 24*in,0.1*in]);
+*
 color("cyan")
 translate([0,-24*in,-0.15*in])
 cube([12*in, 24*in,0.1*in]);
-*/
+
 /* measurements to see how much fabric we actually need */
 /*
 measure_1 = 16*in;
@@ -354,8 +355,8 @@ module half_hat() {
         two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
     }
 }
-
-*translate([0,0,0*in]) {
+*
+translate([0,0,0*in]) {
 half_hat();
 mirror([0,1,0])
 half_hat();
