@@ -25,14 +25,14 @@ import("HeadStand.STL");
 // hatband dimensions. these are distances from origin to various points on the head
 head_rear_len = 4.3*in;
 head_front_len = 4.1*in;
-head_side_len = 3.3*in;
+head_side_len = 3.4*in;
 rear_anchor = [-head_rear_len, 0,0];
 
 head_rear_control_len = 2.2*in;
 head_front_control_len = 2.4*in;
 head_side_control_rear_len = 2.8*in;
 head_side_control_front_len = 2.2*in;
-head_side_control_angle = 3;
+head_side_control_angle = -1;
 
 side_unit_vector = [cos(head_side_control_angle), -sin(head_side_control_angle), 0];
 
@@ -109,7 +109,7 @@ top_control_front = rotate_around_line(top_control_front_raw, rear_inversion_ang
 
 
 
-upper_side_anchor_raw = top_anchor + [-0.3*in, 3.0*in, -0.2*in];
+upper_side_anchor_raw = top_anchor + [-0.3*in, 2.5*in, -0.7*in];
 upper_side_rear_control_len = 2.5*in; 
 upper_side_front_control_len = 4.8*in;
 upper_side_angle = 8;
@@ -217,16 +217,17 @@ module flat_top_half() {
     }
 }
 
-top_panel_fix_rot = -3.4;
-top_panel_sep = -2*mm;
+top_panel_fix_rot = 2.8;
+top_panel_sep = 6*mm;
 nose_fix_rad = 80*mm;
 nose_fix_offset = [165*mm,10*mm];
 module flat_top_panel(){
+    offset(0.1*mm)
     union(){
         translate([0,top_panel_sep])
         rotate(-top_panel_fix_rot)
         flat_top_half();
-        translate([0,top_panel_sep])
+        translate([0,-top_panel_sep])
         mirror([0,1])
         rotate(-top_panel_fix_rot)
         flat_top_half();
@@ -275,7 +276,7 @@ stich_line_offset = 0;// 0.54*in / 2; i forget why i did this but it sucks
 union(){
     
     translate([11*in,4.2*in])
-    rotate(250)
+    rotate(100)
     mirror([0,1])
     difference() {
         offset(r=seam_allowance)
@@ -287,7 +288,7 @@ union(){
 
        
     translate([1.7*in,13*in])
-    rotate(-85)
+    rotate(-90)
     union(){
        
         *square(4*in);
@@ -303,7 +304,7 @@ union(){
     
 
     translate([10.0*in,21*in])
-    rotate(210)
+    rotate(90)
     difference(){
         offset(r=seam_allowance)
         flat_brim();
@@ -355,6 +356,7 @@ module half_hat() {
         two_bezier_patch(brim_inv_extend_spline, brim_forehead_spline,20);
     }
 }
+
 *
 translate([0,0,0*in]) {
 half_hat();
@@ -364,7 +366,8 @@ half_hat();
 echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "millimeters");
 
 // anchor points and handles
-*color("red") {
+*
+color("red") {
     line_segment(rear_control, rear_anchor, control_thickness);
     line_segment(front_control, front_anchor, control_thickness);
     line_segment(side_control_rear, side_control_front, control_thickness);
@@ -387,8 +390,8 @@ echo("hatband size is", 2 * (arclength(q1_brim, 40) + arclength(q2_brim, 40)), "
 }
 
 // bezier tubes / wireframe for hat
-
-*color("pink") {
+*
+color("pink") {
     bezier_tube(q1_brim, 20, control_thickness);
     bezier_tube(q2_brim, 20, control_thickness);
     bezier_tube(brim_forehead_spline, 20, control_thickness);
